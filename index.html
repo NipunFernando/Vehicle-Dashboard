@@ -32,8 +32,8 @@ function startGame() {
     //myCar = new component(50, 80, "white", canvasWidth/6, canvasHeight/2);
 
     // Road 
-    leftRoadLine  = new component(10, canvasHeight, "white", 30, 0,fill=true); 
-    rightRoadLine  = new component(10, canvasHeight/8, "white", 440, 0);
+    leftRoadLine  = new component(10, canvasHeight, "white", 30, 0); 
+    rightRoadLine  = new component(10, canvasHeight/5, "white", 440, 0);
 
 
     myGameArea.start();
@@ -102,22 +102,62 @@ function component(width, height, color, x, y, type) {
         }
         return crash;
     }
+
+    // Proximity Functionality
+    this.closeWith = function(otherobj) {
+        var myleftLim = this.x-20;
+        var myrightLim = this.x + (this.width) + 20;
+        var mytopLim = this.y + 20;
+        let mybottomLim = this.y + (this.height) + 20;
+        var otherleftLim = otherobj.x - 10;
+        var otherrightLim = otherobj.x + (otherobj.width) + 10;
+        var othertopLim = otherobj.y + 10;
+        var otherbottomLim = otherobj.y + (otherobj.height) + 10;
+        var close = true;
+        if ((mybottomLim < othertopLim) || (mytopLim > otherbottomLim) || (myrightLim < otherleftLim) || (myleftLim > otherrightLim)) {
+            close = false;
+        }
+        return close;
+    }
 }
 
 function updateGameArea() {
 
     
-    var x, y;
+    var x, y, rightFlag;
+    rightFlag = false;
     for (i = 0; i < cars_Fast.length; i += 1) {
         if (myCar.crashWith(cars_Fast[i])) {
             myGameArea.stop();
             return;
         } 
+        else if (myCar.closeWith(cars_Fast[i])) {
+            myCar.image.src = "Images/gcarWarn.png";
+            rightFlag = true;
+        }
+        else{
+            myCar.image.src = "Images/gcar.png";
+        }
     }
+
+    for (i = 0; i < cars_Slow.length; i += 1) {
+        if (myCar.crashWith(cars_Slow[i])) {
+            myGameArea.stop();
+            return;
+        }
+        else if (myCar.closeWith(cars_Slow[i])) {
+            myCar.image.src = "Images/gcarWarn.png";
+        }
+        else if(!rightFlag){
+            myCar.image.src = "Images/gcar.png";
+        }
+    }
+    
+    
     myGameArea.clear();
 
-    const min = -30;
-    const max = 30;
+    const min = -25;
+    const max = 40;
     const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
     const randomCar = Math.floor(Math.random() * (carTypes.length));
     const randomColour = Math.floor(Math.random() * (carColours.length));
@@ -130,17 +170,27 @@ function updateGameArea() {
          y = myGameArea.canvas.height;
          cars_Fast.push(new component(50, 80, carColours[randomColour],2*x/3+randomNum, y));
     }
+    else if (myGameArea.frameNo == 1 || everyinterval(300)) {
+         x = myGameArea.canvas.width ;
+         y = myGameArea.canvas.height;
+         cars_Slow.push(new component(50, 80, carColours[randomColour],x/3+randomNum-20, 0));
+    }
     
     for (i = 0; i < cars_Fast.length; i += 1) {
         cars_Fast[i].y += -1;
         cars_Fast[i].update();
     }
+    for (i = 0; i < cars_Slow.length; i += 1) {
+        cars_Slow[i].y += 1;
+        cars_Slow[i].update();
+    }
+
     myCar.newPos();    
     myCar.update();
 
     //  ------------------------- Road center line -----------------
     if (myGameArea.frameNo == 1 || everyinterval(250)) {
-        rightRoadLine  = new component(10, canvasHeight/8, "white", 440, 0);
+        rightRoadLine  = new component(10, canvasHeight/5, "white", 440, 0);
     }
     for (i = 0; i < cars_Fast.length; i += 1) {
         rightRoadLine.y += +1;
@@ -185,7 +235,5 @@ function clearmove() {
   <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">DOWN</button>
 </div>
 
-<p>If you click a button the red square will start moving. The movement will stop when you stop pressing th button.</p>
-<p>We have added the ontouchstart event on the buttons, to make this example work for touch devices.</p>
 </body>
 </html>
