@@ -13,6 +13,7 @@ canvas {
 <script>
 
 var myCar;
+var speed;
 
 // Other cars_Fast
 let carTypes = ["Images/gcar.png", "Images/yvan.png", "Images/wcar.png","Images/bbike.png", "Images/btruck.png"];
@@ -21,15 +22,17 @@ var cars_Fast = [];
 var cars_Slow = [];
 
 var canvasWidth = 480;
-let canvasHeight = 520;
+let canvasHeight = 920;
 
 // Adding road
 var rightRoadLine, leftRoadLine;
 
 function startGame() {
     
-    myCar = new component(50, 80, "Images/gcar.png", canvasWidth/2, canvasHeight/2,"image");
+    myCar = new component(50, 80, "Images/gcar.png", canvasWidth/2, canvasHeight/3,"image");
     //myCar = new component(50, 80, "white", canvasWidth/6, canvasHeight/2);
+    speed = new component("40px", "Consolas", "white", 200, 200, "text");
+    speed.text="SCORE: ";
 
     // Road 
     leftRoadLine  = new component(10, canvasHeight, "white", 30, 0); 
@@ -43,7 +46,7 @@ var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
         this.canvas.width = 480;
-        this.canvas.height = 520;
+        this.canvas.height = 635;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
@@ -69,7 +72,12 @@ function component(width, height, color, x, y, type) {
     this.y = y;    
     this.update = function() {
         ctx = myGameArea.context;
-        if (type == "image") {
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        }
+        else if (type == "image") {
             ctx.drawImage(this.image, 
                 this.x, 
                 this.y,
@@ -228,12 +236,12 @@ function clearmove() {
     myCar.speedY = 0; 
 }
 </script>
-<div style="text-align:center;width:480px;">
+<!-- <div style="text-align:center;width:480px;">
   <button onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()">UP</button><br><br>
   <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
   <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button><br><br>
   <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">DOWN</button>
-</div>
+</div> -->
 
 </body>
 </html>
